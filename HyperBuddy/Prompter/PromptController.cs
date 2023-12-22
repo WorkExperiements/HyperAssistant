@@ -9,7 +9,7 @@ namespace HyperBuddy.Prompter
         [HttpGet]
         public IActionResult Index()
         {
-            return Ok(_promptingService.GetEndpointConfig());
+            return Ok(_promptingService.PromptCogSearch("Tell me about New York"));
         }
     }
 }

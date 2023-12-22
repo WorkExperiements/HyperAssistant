@@ -6,16 +6,16 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
     <div>
-        <textarea id="output"></textarea><button onclick="getConfig()">Get Config</button>
+        <textarea id="output"></textarea>
+        <button onclick="getConfig()">Get Config</button>
     </div>
 </div>
 
 <script>
     function getConfig() {
-        fetch("/prompt")
-            .then((response) => response.json())
-            .then((json) => console.log(json));
+        $.get("/prompt", function (data) {
+            $('#output').val(data)
+        });
     }
 </script>
