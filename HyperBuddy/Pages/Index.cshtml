@@ -4,15 +4,35 @@
     ViewData["Title"] = "Home page";
 }
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <div>
-        <textarea id="output"></textarea>
+    <div class="d-flex p-2 flex-column">
+        <div class="d-flex flex-fill" style="max-width:80%">
+            <input type="text" class="form-control" id="url-input" style="" placeholder="Place recipe URL Here..." />
+        </div>
+        <div class="d-flex mt-3">
+            <button onclick="getConfig()">Learn Recipe</button>
+            <button onclick="loadDemo()" class="mx-4">Load Demo</button>
+        </div>
+    </div>
+    <div class="d-flex p-2 flex-row justify-content-center">
+        <textarea id="output" class="form-control mx-3" style="max-width:40%" readonly rows="4"></textarea>
+        <textarea id="output-citations" class="form-control mx-3" style="max-width:40%" readonly rows="4"></textarea>
+    </div>
+    <div class="d-flex p-2 flex-row justify-content-center">
+        <input type="text" class="form-control" id="user-input" style="max-width:60%" placeholder="Type your prompt here..."/>
+    </div>
+    <div class="d-flex p-2 flex-row justify-content-center">
         <button onclick="getConfig()">Get Config</button>
     </div>
 </div>
 
 <script>
+    function loadDemo(){
+        $('#url-input').val('https://www.bigoven.com/recipe/pappardelle-ai-funghi/3040128');
+    }
     function getConfig() {
         $.get("/prompt", function (data) {
             $('#output').val(data)
