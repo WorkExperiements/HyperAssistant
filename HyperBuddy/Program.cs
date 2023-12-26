@@ -1,10 +1,13 @@
-using HyperBuddy.Prompter;
+using HyperBuddy.Prompter.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IPromptingService, OpenAIPromptingService>();
+builder.Services.AddScoped<ILearningService, LearningService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 var app = builder.Build();
 

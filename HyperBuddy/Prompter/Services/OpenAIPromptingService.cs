@@ -8,7 +8,7 @@ using HyperBuddy.Prompter.Extensions;
 using static System.Net.Mime.MediaTypeNames;
 using HyperBuddy.Prompter.Models;
 
-namespace HyperBuddy.Prompter;
+namespace HyperBuddy.Prompter.Services;
 
 public interface IPromptingService
 {
@@ -24,7 +24,8 @@ public class OpenAIPromptingService : IPromptingService
     private readonly string _azureSearchIndex;
 
     private readonly OpenAIClient _openAIClient;
-    public OpenAIPromptingService(IConfiguration config) {
+    public OpenAIPromptingService(IConfiguration config)
+    {
         _oaiEndpoint = config["OaiConfigs:AzureOAIEndpoint"] ?? "";
         _oaiKey = config["OaiConfigs:AzureOAIKey"] ?? "";
         _oaiModelName = config["OaiConfigs:AzureOAIModelName"] ?? "";
@@ -36,11 +37,11 @@ public class OpenAIPromptingService : IPromptingService
     }
     public ChatResponseObjViewModel PromptCogSearch(string userMsg)
     {
-        
+
 
         // configures the exteions for cognitive search (mainly the endpoint and keys)
         var ownDataConfig = CreateCogSearchExtensionConfig();
-        
+
         // configures the chat completion to send to the client, including user message
         var chatCompletionOptions = CreateChatCompletionOptions(userMsg, ownDataConfig);
 
@@ -56,7 +57,7 @@ public class OpenAIPromptingService : IPromptingService
             Role = responseMessage.Role.ToString()
         };
 
-        
+
         // grab the data informed context and citations
         foreach (var contextMessage in responseMessage.AzureExtensionsContext.Messages.Where(cm => cm is not null))
         {
@@ -66,7 +67,7 @@ public class OpenAIPromptingService : IPromptingService
                 if (parsedObj is not null)
                     chatHistoryResponse.DataContext.Add(parsedObj);
             }
-            catch(Exception) { }
+            catch (Exception) { }
         }
         return chatHistoryResponse;
     }
