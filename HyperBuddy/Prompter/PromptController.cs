@@ -19,7 +19,7 @@ public class PromptController(IPromptingService promptsvc, ILearningService lear
     public async Task<IActionResult> Learn(LearnRequest learnRequest)
     {
         var learnResult = await _learningService.LearnFromUrl(learnRequest.Url ?? string.Empty, learnRequest.Name ?? string.Empty);
-        return Ok();
+        return Ok(learnResult);
     }
 }
 

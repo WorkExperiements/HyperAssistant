@@ -8,6 +8,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IPromptingService, OpenAIPromptingService>();
 builder.Services.AddScoped<ILearningService, LearningService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<IAzureSearchService, AzureSearchService>();
 
 var app = builder.Build();
 

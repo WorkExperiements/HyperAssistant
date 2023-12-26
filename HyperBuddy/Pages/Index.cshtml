@@ -32,7 +32,7 @@
 
 <script>
     function loadDemo(){
-        $('#url-input').val('https://www.bigoven.com/recipe/pappardelle-ai-funghi/3040128');
+        $('#url-input').val('https://www.bigoven.com/recipe/chimichurri/3013692');
         $('#name-input').val('Pappardelle ai funghi')
     }
     function getConfig() {
@@ -41,8 +41,17 @@
         });
     }
     function learn() {
-        $.post("/prompt/learn", { Url: $('#url-input').val(), Name: $('#name-input').val() }, function (data) {
-            $('#output').val(data)
-        });
+        let payload = { Url: $('#url-input').val(), Name: $('#name-input').val() };
+
+        $.post("/prompt/learn",
+            payload,
+            function (data) {
+                console.log('learn return started');
+                setTimeout(function () {
+                    console.log('value of data is...', JSON.stringify(data));
+                    $('#output').val(JSON.stringify(data));
+                }, 20000);
+            }
+        );
     }
 </script>

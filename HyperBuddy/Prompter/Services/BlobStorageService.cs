@@ -30,7 +30,7 @@ public class BlobStorageService : IBlobStorageService
     }
     public async Task<BlobServiceResponse> UploadFile(string blobContents, string fileName)
     {
-        var blobClient = _containerClient.GetBlobClient(fileName);
+        var blobClient = _containerClient.GetBlobClient($"{fileName}.txt");
         await blobClient.UploadAsync(BinaryData.FromString(blobContents), true);
         return new BlobServiceResponse() { Success = true};
     }

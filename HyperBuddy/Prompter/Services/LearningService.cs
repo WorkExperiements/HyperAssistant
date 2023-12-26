@@ -9,10 +9,11 @@ public interface ILearningService
 {
     Task<LearnResponse> LearnFromUrl(string url, string recipeName);
 }
-public class LearningService(IHttpClientFactory httpClientFactory, IBlobStorageService blobStorageService) : ILearningService
+public class LearningService(IHttpClientFactory httpClientFactory, IBlobStorageService blobStorageService, IAzureSearchService azureSearchService) : ILearningService
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
     private readonly IBlobStorageService _blobStorageService = blobStorageService;
+    private readonly IAzureSearchService _azureSearchService = azureSearchService;
 
     public async Task<LearnResponse> LearnFromUrl(string url, string recipeName)
     {
@@ -35,6 +36,7 @@ public class LearningService(IHttpClientFactory httpClientFactory, IBlobStorageS
             await _blobStorageService.UploadFile(cleanContent, recipeName);
 
             // re-index directory
+            await _azureSearchService.RunRecipeIndexer();
         }
         else
         {
