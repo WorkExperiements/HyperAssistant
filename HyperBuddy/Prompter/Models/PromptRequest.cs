@@ -25,7 +25,7 @@ namespace HyperBuddy.Prompter.Models
             }
             else
             {
-                return new ChatRequestSystemMessage(Content);
+                return new ChatRequestAssistantMessage(Content);
             }
         }
     }

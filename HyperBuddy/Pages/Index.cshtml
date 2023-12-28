@@ -29,7 +29,7 @@
             <div class="d-flex align-self-center"><p style="font-size:x-large">Chat Citations</p></div>
         </div>
         <div class="d-flex p-2 flex-row justify-content-center">
-            <textarea id="output" class="form-control mx-3" style="max-width:40%" readonly rows="4"></textarea>
+            <textarea id="output" class="form-control mx-3" style="max-width:40%" readonly rows="16"></textarea>
             <textarea id="output-citations" class="form-control mx-3" style="max-width:40%" readonly rows="4"></textarea>
         </div>
     </div>
@@ -37,18 +37,23 @@
         <input type="text" class="form-control" id="user-input" style="max-width:60%" placeholder="Type your prompt here..." />
     </div>
     <div class="d-flex p-2 flex-row justify-content-center">
-        <button onclick="sendPrompt()">Send</button>
+        <button id="send" onclick="sendPrompt()">Send</button>
     </div>
 </div>
 
 <script>
     var conversations = [];
     var chatHistoryDisplay = '';
-    const USERACTOR = 'User';
-    const SYSACTOR = 'System';
+    const USERACTOR = 'user';
+    const SYSACTOR = 'assistant';
 
     // --------------- Button Actions --------------------
 
+    $("#user-input").keyup(function (event) {
+        if (event.keyCode === 13) {
+            $("#send").click();
+        }
+    });
 
     // Button - Prompts
     function sendPrompt() {
@@ -57,18 +62,13 @@
         $('#user-input').val('');
         addToChatHistory(USERACTOR, userPrompt);
 
-        // TODO: DEBUG ONLY REMOVE!!!
-        // simulate system response
-        addToChatHistory(SYSACTOR, 'This is a test msg. It will not do anything.');
-
         let payload = { history: conversations };
         $.post("/prompt",
             payload,
             function (data) {
-                console.log('prompt return started');
                 console.log('value of data is...', JSON.stringify(data));
-                $('#output').val(JSON.stringify(data));
-
+                addToChatHistory(data.role, data.msgContent);
+                setCitationsTextFromDataContext(data?.dataContext);
             }
         );
 
@@ -88,7 +88,7 @@
                 console.log('learn return started');
                 setTimeout(function () {
                     console.log('value of data is...', JSON.stringify(data));
-                    $('#output').val(JSON.stringify(data));
+                    $('#output-citations').val(JSON.stringify(data));
                 }, 20000);
             }
         );
@@ -98,6 +98,7 @@
     function loadDemo() {
         $('#url-input').val('https://www.bigoven.com/recipe/chimichurri/3013692');
         $('#name-input').val('Pappardelle ai funghi');
+        $('#user-input').val('What are the ingredients for chimichurri?');
     }
 
     // ---------------- Other ------------------
@@ -115,5 +116,21 @@
 
         // update visible value of chat field
         $('#output').val(chatHistoryDisplay);
+        var textarea = document.getElementById('output');
+        textarea.scrollTop = textarea.scrollHeight;
+    }
+
+    function setCitationsTextFromDataContext(dataContext) {
+        try {
+            let citations = dataContext[0].citations;
+            let intent = dataContext[0].intent;
+            let outputText = 'Intent: ' + intent + '\r\n\r\n';
+            citations.forEach((citation) =>
+                outputText = outputText + 'Citation: ' + citation.content + '\r\n\r\n');
+
+            $('#output-citations').val(outputText);
+        }
+        catch (error) { console.log(JSON.stringify(error)); }
+        
     }
 </script>

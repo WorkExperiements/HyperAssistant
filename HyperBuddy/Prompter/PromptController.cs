@@ -9,7 +9,7 @@ public class PromptController(IPromptingService promptsvc, ILearningService lear
     private readonly IPromptingService _promptingService = promptsvc;
     private readonly ILearningService _learningService = learningService;
 
-    [HttpGet]
+    [HttpPost]
     public IActionResult Index(PromptRequest promptRequest)
     {
         // make sure the chat has history

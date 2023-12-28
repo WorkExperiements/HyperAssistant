@@ -7,7 +7,7 @@ namespace HyperBuddy.Prompter.Services;
 
 public interface IPromptingService
 {
-    ChatResponseObjViewModel PromptCogSearch(List<ChatMessage> chatHistory);
+    PromptResponse PromptCogSearch(List<ChatMessage> chatHistory);
 }
 public class OpenAIPromptingService : IPromptingService
 {
@@ -17,6 +17,8 @@ public class OpenAIPromptingService : IPromptingService
     private readonly string _azureSearchEndpoint;
     private readonly string _azureSearchKey;
     private readonly string _azureSearchIndex;
+
+    private readonly ChatRequestSystemMessage _defaultSysMsg = new("You are an AI assistant that helps navigate a chef through a recipe");
 
     private readonly OpenAIClient _openAIClient;
     public OpenAIPromptingService(IConfiguration config)
@@ -30,7 +32,7 @@ public class OpenAIPromptingService : IPromptingService
 
         _openAIClient = new OpenAIClient(new Uri(_oaiEndpoint), new AzureKeyCredential(_oaiKey));
     }
-    public ChatResponseObjViewModel PromptCogSearch(List<ChatMessage> chatHistory)
+    public PromptResponse PromptCogSearch(List<ChatMessage> chatHistory)
     {
         // configures the exteions for cognitive search (mainly the endpoint and keys)
         var ownDataConfig = CreateCogSearchExtensionConfig();
@@ -44,7 +46,7 @@ public class OpenAIPromptingService : IPromptingService
 
 
         // handle the response and build the response objs
-        ChatResponseObjViewModel chatHistoryResponse = new()
+        PromptResponse chatHistoryResponse = new()
         {
             MsgContent = responseMessage.Content ?? "*ERROR*",
             Role = responseMessage.Role.ToString()
@@ -65,6 +67,7 @@ public class OpenAIPromptingService : IPromptingService
         return chatHistoryResponse;
     }
 
+    #region Private Methods
     private AzureCognitiveSearchChatExtensionConfiguration CreateCogSearchExtensionConfig()
     {
         // Create extension config for own data
@@ -86,18 +89,20 @@ public class OpenAIPromptingService : IPromptingService
     private ChatCompletionsOptions CreateChatCompletionOptions(List<ChatMessage> chatHistory, AzureCognitiveSearchChatExtensionConfiguration ownDataConfig)
     {
         // create the base object
-        ChatCompletionsOptions chatCompletionsOptions = new ChatCompletionsOptions()
+        ChatCompletionsOptions chatCompletionsOptions = new()
         {
             MaxTokens = 600,
             Temperature = 0.9f,
             DeploymentName = _oaiModelName,
-            // Specify extension options
+            // Specify extension options to use Azure Search
             AzureExtensionsOptions = new AzureChatExtensionsOptions()
             {
                 Extensions = { ownDataConfig }
-            },
-            
+            },  
         };
+
+        // add the system message: "You are an AI assistant that helps with recipe..."
+        chatCompletionsOptions.Messages.Add(_defaultSysMsg);
 
         // add the chat history
         chatHistory.ForEach(msg => 
@@ -105,5 +110,6 @@ public class OpenAIPromptingService : IPromptingService
 
         return chatCompletionsOptions;
     }
+    #endregion
 }
 

@@ -11,7 +11,7 @@ public interface IAzureSearchService
 public class AzureSearchService(IConfiguration configs): IAzureSearchService
 {
     private readonly SearchIndexerClient _searchIndexerClient = CreateSearchIndexClient(configs);
-    private readonly string _indexerName = configs.GetValue<string>("SearchIndexerName") ?? string.Empty;
+    private readonly string _indexerName = configs.GetValue<string>("OaiConfigs:AzureSearchIndexer") ?? string.Empty;
 
     public async Task RunRecipeIndexer()
     {
@@ -21,8 +21,8 @@ public class AzureSearchService(IConfiguration configs): IAzureSearchService
 
     private static SearchIndexerClient CreateSearchIndexClient(IConfiguration configuration)
     {
-        string searchServiceEndPoint = configuration.GetValue<string>("SearchIndexerEndpoint") ?? string.Empty;
-        string adminApiKey = configuration.GetValue<string>("SearchIndexerKey") ?? string.Empty;
+        string searchServiceEndPoint = configuration.GetValue<string>("OaiConfigs:AzureSearchEndpoint") ?? string.Empty;
+        string adminApiKey = configuration.GetValue<string>("OaiConfigs:AzureSearchKey") ?? string.Empty;
 
         SearchIndexerClient indexClient = new SearchIndexerClient(new Uri(searchServiceEndPoint), new AzureKeyCredential(adminApiKey));
         return indexClient;
