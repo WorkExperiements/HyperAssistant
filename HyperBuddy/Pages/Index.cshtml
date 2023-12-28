@@ -24,20 +24,30 @@
 
     <!-- Contains the Chat area-->
     <div class="d-flex flex-column">
-        <div class="d-flex flex-row justify-content-around">
-            <div class="d-flex align-self-start"><p style="font-size:x-large">Chat History</p></div>
-            <div class="d-flex align-self-center"><p style="font-size:x-large">Chat Citations</p></div>
-        </div>
         <div class="d-flex p-2 flex-row justify-content-center">
-            <textarea id="output" class="form-control mx-3" style="max-width:40%" readonly rows="16"></textarea>
+            <div class="card" style="width: 45rem; min-height: 34rem">
+                <div class="card-header">
+                    Chat History
+                </div>
+                <div id="chat-output" class="card-body d-flex flex-column chat-scroll">
+                    <div class="chat-container">
+                        <img src="/img/icons8-user-avatar-96.png" alt="Avatar" class="right">
+                        <p>Hello. How are you today?</p>
+                        <span class="time-right">11:00</span>
+                    </div>
+                    <div class="chat-container chat-darker">
+                        <img src="/img/icons8-bot-96.png" alt="Avatar">
+                        <p>Hey! I'm fine. Thanks for asking!</p>
+                        <span class="time-left">11:01</span>
+                    </div>
+                </div>
+            </div>
             <textarea id="output-citations" class="form-control mx-3" style="max-width:40%" readonly rows="4"></textarea>
         </div>
     </div>
     <div class="d-flex p-2 flex-row justify-content-center">
         <input type="text" class="form-control" id="user-input" style="max-width:60%" placeholder="Type your prompt here..." />
-    </div>
-    <div class="d-flex p-2 flex-row justify-content-center">
-        <button id="send" onclick="sendPrompt()">Send</button>
+        <button type="button" class="btn btn-primary mx-2" id="send" onclick="sendPrompt()">Send</button>
     </div>
 </div>
 
@@ -106,18 +116,33 @@
         return { from: actor, content: message };
     }
 
-    function addToChatHistory(actor, message) {
-        // update the history variable
-        chatHistoryDisplay = chatHistoryDisplay + actor + ': ' + message + '\n\r';
+    function addToChatHistory(actor, inMessage) {
+        // update visible value of chat field
+        let message = inMessage.replaceAll("\n", "<br/>")
+        let elemToAdd;
+        if (actor == USERACTOR) {
+            elemToAdd = `<div class="chat-container">
+                <img src="/img/icons8-user-avatar-96.png" alt="Avatar" class="right">
+                <p>` + message + `</p>
+            </div>`
+        }
+        else {
+            elemToAdd = `<div class="chat-container chat-darker">
+                <img src="/img/icons8-bot-96.png" alt="Avatar">
+                <p>` + message + `</p>
+            </div>`;
+        }
+        $('#chat-output').append(elemToAdd);
+        $('#chat-output').scrollTop($('#chat-output')[0].scrollHeight)
 
         // create the chat obj
         let chatMsgObj = createChatMessage(actor, message);
         conversations.push(chatMsgObj);
 
         // update visible value of chat field
-        $('#output').val(chatHistoryDisplay);
-        var textarea = document.getElementById('output');
-        textarea.scrollTop = textarea.scrollHeight;
+        //$('#output').val(chatHistoryDisplay);
+        //var textarea = document.getElementById('output');
+        //textarea.scrollTop = textarea.scrollHeight;
     }
 
     function setCitationsTextFromDataContext(dataContext) {
@@ -131,6 +156,5 @@
             $('#output-citations').val(outputText);
         }
         catch (error) { console.log(JSON.stringify(error)); }
-        
     }
 </script>

@@ -1,16 +1,21 @@
 ﻿/* Chat containers */
 .chat-container {
+    width:90%;
     border: 2px solid #dedede;
     background-color: #f1f1f1;
     border-radius: 5px;
     padding: 10px;
     margin: 10px 0;
+    text-align: end;
+    align-self: end;
 }
 
 /* Darker chat container */
 .chat-darker {
     border-color: #ccc;
     background-color: #ddd;
+    text-align: start;
+    align-self: start;
 }
 
 /* Clear floats */
@@ -46,4 +51,9 @@
 .time-left {
     float: left;
     color: #999;
+}
+
+.chat-scroll {
+    max-height: 500px;
+    overflow-y: auto;
 }
