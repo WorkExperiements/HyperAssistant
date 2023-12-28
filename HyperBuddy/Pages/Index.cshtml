@@ -9,7 +9,7 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    
+
     <!-- Contains the "learning" header section-->
     <div class="d-flex p-2 flex-column">
         <div class="d-flex flex-fill" style="max-width:80%">
@@ -34,23 +34,51 @@
         </div>
     </div>
     <div class="d-flex p-2 flex-row justify-content-center">
-        <input type="text" class="form-control" id="user-input" style="max-width:60%" placeholder="Type your prompt here..."/>
+        <input type="text" class="form-control" id="user-input" style="max-width:60%" placeholder="Type your prompt here..." />
     </div>
     <div class="d-flex p-2 flex-row justify-content-center">
-        <button onclick="getConfig()">Get Config</button>
+        <button onclick="sendPrompt()">Send</button>
     </div>
 </div>
 
 <script>
-    function loadDemo(){
-        $('#url-input').val('https://www.bigoven.com/recipe/chimichurri/3013692');
-        $('#name-input').val('Pappardelle ai funghi')
+    var conversations = [];
+    var chatHistoryDisplay = '';
+    const USERACTOR = 'User';
+    const SYSACTOR = 'System';
+
+    // --------------- Button Actions --------------------
+
+
+    // Button - Prompts
+    function sendPrompt() {
+
+        let userPrompt = $('#user-input').val();
+        $('#user-input').val('');
+        addToChatHistory(USERACTOR, userPrompt);
+
+        // TODO: DEBUG ONLY REMOVE!!!
+        // simulate system response
+        addToChatHistory(SYSACTOR, 'This is a test msg. It will not do anything.');
+
+        let payload = { history: conversations };
+        $.post("/prompt",
+            payload,
+            function (data) {
+                console.log('prompt return started');
+                console.log('value of data is...', JSON.stringify(data));
+                $('#output').val(JSON.stringify(data));
+
+            }
+        );
+
+
+        //$.get("/prompt", function (data) {
+        //    $('#output').val(data)
+        //});
     }
-    function getConfig() {
-        $.get("/prompt", function (data) {
-            $('#output').val(data)
-        });
-    }
+
+    // Button - Learn
     function learn() {
         let payload = { Url: $('#url-input').val(), Name: $('#name-input').val() };
 
@@ -64,5 +92,28 @@
                 }, 20000);
             }
         );
+    }
+
+    // Button - loads demo values
+    function loadDemo() {
+        $('#url-input').val('https://www.bigoven.com/recipe/chimichurri/3013692');
+        $('#name-input').val('Pappardelle ai funghi');
+    }
+
+    // ---------------- Other ------------------
+    function createChatMessage(actor, message) {
+        return { from: actor, content: message };
+    }
+
+    function addToChatHistory(actor, message) {
+        // update the history variable
+        chatHistoryDisplay = chatHistoryDisplay + actor + ': ' + message + '\n\r';
+
+        // create the chat obj
+        let chatMsgObj = createChatMessage(actor, message);
+        conversations.push(chatMsgObj);
+
+        // update visible value of chat field
+        $('#output').val(chatHistoryDisplay);
     }
 </script>

@@ -10,9 +10,15 @@ public class PromptController(IPromptingService promptsvc, ILearningService lear
     private readonly ILearningService _learningService = learningService;
 
     [HttpGet]
-    public IActionResult Index()
+    public IActionResult Index(PromptRequest promptRequest)
     {
-        return Ok(_promptingService.PromptCogSearch("Tell me about New York"));
+        // make sure the chat has history
+        if(!(promptRequest?.History?.Any() ?? false))
+        {
+            return BadRequest("There are no items in the chat history");
+        }
+        var response = _promptingService.PromptCogSearch(promptRequest.History);
+        return Ok(response);
     }
 
     [HttpPost]
